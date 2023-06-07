@@ -1,0 +1,6 @@
+{
+	"tickers": ["AAPL", "MSF"],
+	"strategy": "test",
+	"currency": "USD",
+	"heartbeat_frequency": 60
+}
