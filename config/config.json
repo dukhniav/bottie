@@ -2,5 +2,13 @@
 	"tickers": ["AAPL", "MSF"],
 	"strategy": "test",
 	"currency": "USD",
-	"heartbeat_frequency": 60
+	"sentiment": {
+		"enabled": false,
+		"positive_range": 50,
+		"sources": []
+	},
+	"heartbeat_frequency": 60,
+	"training_wheels": true,
+	"exchange": "",
+	"paper_exchange": ""
 }
