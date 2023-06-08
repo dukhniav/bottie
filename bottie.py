@@ -50,10 +50,19 @@ class Bottie:
 
         # Initialize exchange connection
         self.exchange = self.config.EXCHANGE
-        self.logger.info(f"Connecting to {self.exchange.value}")
+        self.logger.info(f"Connecting to {self.exchange}")
 
         exchange_api = self.exchange.create_api()
-        exchange_api.exchange.get_account()
+        self.config.get_exchange_credentials(exchange_api.name)
+
+        # Establish exchange connection
+        self.conn = exchange_api.exchange.establish_connection(
+            self.config.EXCHANGE_API_KEY,
+            self.config.EXCHANGE_API_SECRET,
+            self.config.TRAINING_WHEELS,
+        )
+
+        # exchange_api.exchange.get_account(self.conn)
 
     def handle_signal(self, signum, frame):
         # Custom signal handler function

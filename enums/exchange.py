@@ -22,15 +22,15 @@ class Exchange(Enum):
         elif self == Exchange.KRAKEN:
             return KrakenAPI()
         elif self == Exchange.MARKETWATCH:
-            return KrakenAPI()
+            return MarketwatchAPI()
         elif self == Exchange.INVESTOPEDIA:
-            return KrakenAPI()
+            return InvestopediaAPI()
         elif self == Exchange.FINVIZ:
-            return KrakenAPI()
+            return FinvizAPI()
         elif self == Exchange.THINKORSWIM:
-            return KrakenAPI()
+            return ThinkOrSwimAPI()
         elif self == Exchange.ETORO:
-            return etoro()
+            return eToroAPI()
         elif self == Exchange.ALPACA:
             return AlpacaAPI()
         else:
@@ -87,5 +87,6 @@ class eToroAPI:
 
 class AlpacaAPI:
     def __init__(self):
-        # Initialization code for eToro API
+        # Initialization code for Alpaca API
         self.exchange = Alpaca()
+        self.name = Exchange.ALPACA.name
