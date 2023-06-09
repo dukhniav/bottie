@@ -2,6 +2,8 @@
 from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import MarketOrderRequest, LimitOrderRequest
 from alpaca.trading.enums import OrderSide, TimeInForce
+import alpaca_trade_api as tradeapi
+
 
 from logging import getLogger
 
@@ -56,41 +58,6 @@ class AlpacaAPI(ExchangeInterface):
         """
         pass
 
-    def create_buy_order(
-        self, trading_client: TradingClient, type, symbol, quantity, price, side
-    ):
-        """
-        Create buy order
-        """
-
-        if type == OrderType.MARKET:
-            # preparing market order
-            market_order_data = MarketOrderRequest(
-                symbol="SPY",
-                qty=0.023,
-                side=OrderSide.BUY,
-                time_in_force=TimeInForce.DAY,
-            )
-            # Market order
-            market_order = trading_client.submit_order(order_data=market_order_data)
-        elif type == OrderType.LIMIT:
-            # preparing limit order
-            limit_order_data = LimitOrderRequest(
-                symbol=symbol,
-                limit_price=price,
-                notional=4000,
-                side=side,
-                time_in_force=TimeInForce.FOK,
-            )
-            # Limit order
-            limit_order = trading_client.submit_order(order_data=limit_order_data)
-
-    def create_sell_order(self, type, symbol, quantity, price, side):
-        """
-        Create sell order
-        """
-        pass
-
     def get_account(self, trading_client: TradingClient):
         # Getting account information and printing it
         self.logger.info("Getting alpaca account info...")
@@ -112,3 +79,116 @@ class AlpacaAPI(ExchangeInterface):
         # Check our current balance vs. our balance at the last market close
         balance_change = float(account.equity) - float(account.last_equity)
         print(f"Today's portfolio balance change: ${balance_change}")
+
+    def market_order(
+        self,
+        tc: TradingClient,
+        symbol: str,
+        quantity: float,
+        side: OrderSide,
+    ):
+        """
+        Place market buy order
+        """
+        # preparing market order
+        market_order_data = MarketOrderRequest(
+            symbol=symbol, qty=quantity, side=side, time_in_force=TimeInForce.DAY
+        )
+
+        # Market order
+        market_order = tc.submit_order(order_data=market_order_data)
+
+    def limit_order(
+        self,
+        tc: TradingClient,
+        symbol: str,
+        quantity: float,
+        price: float,
+        side: OrderSide,
+    ):
+        """
+        Place limit buy order
+        """
+        # preparing limit order
+        limit_order_data = LimitOrderRequest(
+            symbol=symbol,
+            quantity=quantity,
+            limit_price=price,
+            notional=4000,
+            side=side,
+            time_in_force=TimeInForce.FOK,
+        )
+
+        # Limit order
+        limit_order = tc.submit_order(order_data=limit_order_data)
+
+    def stop_order(
+        self,
+        tc: TradingClient,
+        symbol: str,
+        quantity: float,
+        side: OrderSide,
+        type: OrderType = OrderType.STOP,
+    ):
+        """
+        Place stop buy order
+        """
+        pass
+
+    def stop_limit_order(
+        self,
+        tc: TradingClient,
+        symbol: str,
+        quantity: float,
+        side: OrderSide,
+        type: OrderType = OrderType.STOP_LIMIT,
+    ):
+        """
+        Place stop limit buy order
+        """
+        pass
+
+    def trailing_stop_order(
+        self,
+        tc: TradingClient,
+        symbol: str,
+        quantity: float,
+        trail_price: float,
+        side: OrderSide,
+        type=OrderType.TRAILING_STOP,
+    ):
+        """
+        Place trailing stop buy order
+        """
+
+        api = tradeapi.REST()
+
+        # Submit a market order to buy 1 share of Apple at market price
+        api.submit_order(
+            symbol=symbol,
+            qty=quantity,
+            side=side,
+            type=OrderType.MARKET,
+            time_in_force="gtc",
+        )
+
+        # Submit a trailing stop order to sell 1 share of Apple at a
+        # trailing stop of
+        api.submit_order(
+            symbol=symbol,
+            qty=quantity,
+            side=side,
+            type=type,
+            trail_price=trail_price,  # stop price will be hwm - 1.00$
+            time_in_force="gtc",
+        )
+
+        # Alternatively, you could use trail_percent:
+        api.submit_order(
+            symbol="AAPL",
+            qty=1,
+            side="sell",
+            type="trailing_stop",
+            trail_percent=1.0,  # stop price will be hwm*0.99
+            time_in_force="gtc",
+        )
