@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 
+from enums.order_side import OrderSide
+from enums.order_type import OrderType
+
 
 class ExchangeInterface(ABC):
     @abstractmethod
@@ -33,15 +36,37 @@ class ExchangeInterface(ABC):
         pass
 
     @abstractmethod
-    def create_buy_order(self, type, symbol, quantity, price, side):
+    def buy_market_order(
+        self, symbol, quantity, type=OrderType.MARKET, side=OrderSide.BUY
+    ):
         """
-        Place buy order
+        Place market buy order
         """
         pass
 
     @abstractmethod
-    def create_sell_order(self, type, symbol, quantity, price, side):
+    def buy_limit_order(
+        self, symbol, quantity, price, type=OrderType.LIMIT, side=OrderSide.BUY
+    ):
         """
-        Place sell order
+        Place limit buy order
+        """
+        pass
+
+    @abstractmethod
+    def sell_market_order(
+        self, symbol, quantity, type=OrderType.MARKET, side=OrderSide.SELL
+    ):
+        """
+        Place market sell order
+        """
+        pass
+
+    @abstractmethod
+    def sell_limit_order(
+        self, symbol, quantity, price, type=OrderType.LIMIT, side=OrderSide.SELL
+    ):
+        """
+        Place limit sell order
         """
         pass
