@@ -1,0 +1,23 @@
+{
+	"tickers": [
+		"AAPL",
+		"MSF",
+		"GOOG"
+	],
+	"strategy": "test",
+	"currency": "USD",
+	"sentiment": {
+		"enabled": false,
+		"positive_range": 50,
+		"sources": []
+	},
+	"db_name": "bottie.db",
+	"heartbeat_frequency": 60,
+	"training_wheels": true,
+	"ticker_update_interval": 5,
+	"exchange": "",
+	"paper_exchange": "",
+	"paper_account": {
+		"start_value": 1000
+	}
+}
