@@ -26,6 +26,8 @@ class Configuration:
         self.HEARTBEAT_FREQUENCY = self._config["heartbeat_frequency"]
         self.TRAINING_WHEELS = self._config["training_wheels"]
 
+        self.DB_NAME = self._config["db_name"]
+
         # Finnhub credentials
         finnhub = self._credentials["finnhub"]
         self.FINNHUB_API_KEY = finnhub["api_key"]

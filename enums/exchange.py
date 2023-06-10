@@ -1,6 +1,6 @@
 from enum import Enum
 
-from exchanges.alpaca_api import AlpacaAPI as Alpaca
+from interfaces.alpaca_api import AlpacaAPI as Alpaca
 
 
 class Exchange(Enum):

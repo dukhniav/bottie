@@ -6,6 +6,7 @@ from logging import getLogger
 from utils.utils import Utils
 from utils.config import Configuration
 from interfaces.finnhub_api import Finnhub
+from utils.transactions import Transaction
 
 
 class Worker:
