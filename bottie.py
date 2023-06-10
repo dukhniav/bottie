@@ -16,7 +16,7 @@ class Bottie:
         self.config = Configuration()
         self.utils = Utils(self.config)
         self.ticker_manager = TickerManager(self.config)
-        self.worker = Worker(self.utils)
+        self.worker = Worker(self.utils, self.config)
         self.worker_thread = None
 
     def run(self):
@@ -38,6 +38,10 @@ class Bottie:
                 self.add_ticker()
             elif option == 6:
                 self.remove_ticker()
+            elif option == 7:
+                self.test_historical()
+            elif option == 9:
+                self.testing_functionality()
             elif option == 0:
                 break
             else:
@@ -51,6 +55,8 @@ class Bottie:
         print("4. View Current Tickers")
         print("5. Add Ticker")
         print("6. Remove Ticker")
+        print("7. Test on historical data")
+        print("9. Testing functionality")
         print("0. Exit")
 
         try:
@@ -58,6 +64,26 @@ class Bottie:
             return option
         except ValueError:
             return 0
+
+    def testing_functionality(self):
+        _from = "6/1/23"
+        to = "6/2/23"
+        ticker = "aapl"
+
+        tf = self.worker.get_ticker_candles("aapl", "60", _from, to)
+        print(tf)
+        print("----------------------=========================")
+        print(self.utils.convert_to_dataframe(tf))
+
+        print("----------------------=========================")
+        curr_price = self.worker.get_ticker_quote(ticker)
+        print(curr_price)
+        print("----------------------=========================")
+
+        print(curr_price.get("high"))
+
+    def test_historical(self):
+        pass
 
     def start_bot(self):
         if not self.worker_thread or not self.worker_thread.is_alive():

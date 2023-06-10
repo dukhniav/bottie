@@ -8,7 +8,7 @@ import alpaca_trade_api as tradeapi
 from logging import getLogger
 
 # from utils.config import Configuration
-from exchanges.abstract_api import ExchangeInterface
+from interfaces.abstract_api import ExchangeInterface
 from enums.order_type import OrderType
 
 

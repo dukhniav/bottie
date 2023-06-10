@@ -1,6 +1,9 @@
 import sched
 import time
 import threading
+import datetime
+import pandas as pd
+
 from logging import getLogger
 
 from utils.config import Configuration
@@ -44,5 +47,22 @@ class Utils:
         # Reschedule the heartbeat after the interval
         self.scheduler.enter(self.interval, 1, self.heartbeat)
 
-    # def establish_exchange_connection(self):
-    #     if self.config.TRAINING_WHEELS:
+    def convert_timestamp(self, date_string):
+        # Parse the date string to a datetime object
+        datetime_obj = datetime.datetime.strptime(date_string, "%m/%d/%y")
+
+        # Convert datetime object to Unix timestamp
+        timestamp = datetime_obj.timestamp()
+
+        return timestamp
+
+    def convert_to_dataframe(self, res):
+        """Convert market data to pandas dataframe
+
+        Args:
+            res (_type_): resolution
+
+        Returns:
+            pandas: pandas dataframe
+        """
+        return pd.DataFrame(res)
