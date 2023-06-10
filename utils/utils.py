@@ -19,6 +19,7 @@ class Utils:
         self.thread = None
 
     def start_heartbeat(self):
+        self.logger.info("Initializing heartbeat...")
         if not self.running:
             self.running = True
             self.thread = threading.Thread(target=self._run_heartbeat)

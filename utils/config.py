@@ -52,7 +52,7 @@ class Configuration:
         self.EXCHANGE = self.get_trading_exchange(exchange_live, exchange_paper)
 
     def get_exchange_credentials(self, exchange: Exchange):
-        self.logger.info("Getting exchange credentials")
+        self.logger.info("Getting exchange credentials...")
         if exchange == Exchange.ALPACA.name:
             alpaca_credentials = self._credentials["alpaca"]
             self.EXCHANGE_API_KEY = alpaca_credentials["client_id"]
@@ -124,6 +124,8 @@ class Configuration:
             return False
 
     def view_config(self):
+        self.logger.info("Requested config overview... ")
+
         print("Configuration:")
         print(f"Tickers: {', '.join(self._config['tickers'])}")
         print(f"Strategy: {self._config['strategy']}")
