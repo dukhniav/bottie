@@ -1,12 +1,18 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+import logging
+
 from bottie.configuration.configuration import config
 from bottie.constants import DEFAULT_ACCOUNT_NAME, DEFAULT_PORTFOLIO_NAME
 from bottie.persistance.models import Portfolio, Account
 
+logger = logging.getLogger(__name__)
+
 
 def initialize_models():
+    logger.info("Initialize persistance models...")
+
     engine = create_engine(config.get_db_url(), echo=False)
     Session = sessionmaker(bind=engine)
     session = Session()

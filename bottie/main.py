@@ -18,6 +18,8 @@ from bottie import __version__
 from bottie.loggers import setup_logging
 
 from bottie.bottie import Bottie
+from bottie.utils.menu import run_menu_in_thread
+
 
 logger = logging.getLogger("bottie")
 
@@ -30,8 +32,10 @@ def main() -> None:
         logger.info(f"bottie {__version__}")
         gc_set_threshold()
 
-        bottie = Bottie()
-        bottie.run()
+        Bottie()
+
+        run_menu_in_thread()
+
     except SystemExit as e:  # pragma: no cover
         return_code = e
     except KeyboardInterrupt:

@@ -20,7 +20,10 @@ class Configuration:
     def _load_config(self):
         with open(constants.CONFIG_FILE_PATH) as file:
             self._config = json.load(file)
-            print(self._config)
+        file.close()
+
+        with open(constants.CREDENTIALS_FILE_PATH) as file:
+            self._credentials = json.load(file)
         file.close()
 
     # Dry run config
@@ -37,9 +40,12 @@ class Configuration:
     def get_initial_state(self):
         return self._config['initial_state']
 
+    # API config
+    def get_finnhub_credentials(self) -> list:
+        _finnhub = self._credentials['finnhub']
+        return {'api_key': _finnhub['api_key'], 'webhook_secret': _finnhub['webhook_secret']}
+
 
 # def setup_logging_config(self):
 #     self.
-
-
 config = Configuration()

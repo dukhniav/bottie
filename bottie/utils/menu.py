@@ -2,41 +2,89 @@ import os
 import threading
 import getch
 
+from typing import Dict
+
 from bottie.enums.menu_options import MenuOptions
 
-
-def get_account_value():
-    return "Getting account value..."
+from bottie.bottie import bottie
 
 
-# Add other menu functions here
-def callback_value(value):
-    return value
+def start_worker():
+    if bottie.start_worker():
+        return "Worker started."
+    else:
+        return "Unable to start worker."
 
 
-def exit_program():
-    return "Exiting program..."
-    quit()
+def stop_worker():
+    if bottie.stop_worker():
+        return "Worker stopped."
+    else:
+        return "Unable to stop worker."
+
+
+def get_account_balance():
+    return MenuOptions.ACCOUNT_BALANCE
+
+
+def get_available_funds():
+    avail_funds = bottie.show_available_funds()
+    msg = f'Available funds: ${avail_funds}'
+    return format_result(msg)
+
+
+def reload_config():
+    return MenuOptions.CONFIG_RELOAD
+
+
+def view_tickers():
+    return MenuOptions.CONFIG_VIEW_TICKERS
+
+
+def add_ticker():
+    return MenuOptions.CONFIG_ADD_TICKER
+
+
+def remove_ticker():
+    return MenuOptions.CONFIG_REMOVE_TICKER
+
+
+def get_quote():
+    quote: Dict = bottie.get_quote()
+    msg = f"Price for {quote.get('ticker')}: {quote.get('quote')}"
+    return format_result(msg)
+
+
+def submit_manual_trade():
+    return MenuOptions.MANUAL_TRADE
+
+
+def view_pending_trades():
+    return MenuOptions.MANUAL_PENDING
+
+
+def get_last_trades():
+    return MenuOptions.MANUAL_GET_TRADES
 
 
 menu = {
-    1: (MenuOptions.START.value, callback_value(MenuOptions.START)),
-    2: (MenuOptions.STOP.value, callback_value(MenuOptions.STOP)),
+    1: (MenuOptions.START.value, start_worker),
+    2: (MenuOptions.STOP.value, stop_worker),
     3: (MenuOptions.ACCOUNT_MANAGE.value, {
-        1: (MenuOptions.ACCOUNT_BALANCE.value, callback_value(MenuOptions.ACCOUNT_BALANCE)),
-        2: (MenuOptions.ACCOUNT_AVAILABLE.value, callback_value(MenuOptions.ACCOUNT_AVAILABLE))
+        1: (MenuOptions.ACCOUNT_BALANCE.value, get_account_balance),
+        2: (MenuOptions.ACCOUNT_AVAILABLE.value, get_available_funds)
     }),
     4: (MenuOptions.CONFIG_MANAGE.value, {
-        1: (MenuOptions.CONFIG_RELOAD.value, callback_value(MenuOptions.CONFIG_RELOAD)),
-        2: (MenuOptions.CONFIG_VIEW_TICKERS.value, callback_value(MenuOptions.CONFIG_VIEW_TICKERS)),
-        3: (MenuOptions.CONFIG_ADD_TICKER.value, callback_value(MenuOptions.CONFIG_ADD_TICKER)),
-        4: (MenuOptions.CONFIG_REMOVE_TICKER.value, callback_value(MenuOptions.CONFIG_REMOVE_TICKER))
+        1: (MenuOptions.CONFIG_RELOAD.value, reload_config),
+        2: (MenuOptions.CONFIG_VIEW_TICKERS.value, view_tickers),
+        3: (MenuOptions.CONFIG_ADD_TICKER.value, add_ticker),
+        4: (MenuOptions.CONFIG_REMOVE_TICKER.value, remove_ticker)
     }),
     5: (MenuOptions.MANUAL.value, {
-        1: (MenuOptions.MANUAL_QUOTE.value, callback_value(MenuOptions.MANUAL_QUOTE)),
-        2: (MenuOptions.MANUAL_TRADE.value, callback_value(MenuOptions.MANUAL_TRADE)),
-        3: (MenuOptions.MANUAL_PENDING.value, callback_value(MenuOptions.MANUAL_PENDING)),
-        4: (MenuOptions.MANUAL_GET_TRADES.value, callback_value(MenuOptions.MANUAL_GET_TRADES))
+        1: (MenuOptions.MANUAL_QUOTE.value, get_quote),
+        2: (MenuOptions.MANUAL_TRADE.value, submit_manual_trade),
+        3: (MenuOptions.MANUAL_PENDING.value, view_pending_trades),
+        4: (MenuOptions.MANUAL_GET_TRADES.value, get_last_trades)
     })}
 
 
@@ -70,10 +118,26 @@ def execute_action(action):
         return None
 
 
+def format_result(result: str):
+    offset = 5  # Number of characters to offset
+
+    # Add offset spaces
+    result = " " * offset + result
+
+    formatted_result = f"\n{'-' * (len(result) + offset)}\
+        \n{result}\
+        \n{'-' * (len(result) + offset)}"
+
+    return formatted_result
+
+
 def handle_menu_action(result):
     clear_screen()
     print("Action Result:")
-    print(result)
+    if result is not None:
+        print(result)
+    else:
+        print("No action result.")
     press_any_key()
     clear_screen()
 
