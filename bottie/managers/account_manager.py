@@ -37,6 +37,15 @@ class AccountManager:
         accounts = session.query(Account).all()
         return accounts
 
+    def get_account_available_funds(self, account_name=DEFAULT_ACCOUNT_NAME):
+        """
+        Return account available balance
+        """
+        account = self.get_account_by_name(account_name)
+        if account:
+            return account.available_funds
+        return None
+
     def get_total_funds(self, account_name=DEFAULT_ACCOUNT_NAME):
         """
         Calculate the total funds (available + pending) for an account.

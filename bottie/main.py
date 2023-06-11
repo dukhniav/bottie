@@ -31,6 +31,7 @@ def main() -> None:
         gc_set_threshold()
 
         bottie = Bottie()
+        bottie.run()
     except SystemExit as e:  # pragma: no cover
         return_code = e
     except KeyboardInterrupt:

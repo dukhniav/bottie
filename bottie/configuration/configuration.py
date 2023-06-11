@@ -8,7 +8,8 @@ class Configuration:
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
-            cls._instance = super(Configuration, cls).__new__(cls, *args, **kwargs)
+            cls._instance = super(Configuration, cls).__new__(
+                cls, *args, **kwargs)
         return cls._instance
 
     def __init__(self):
@@ -32,6 +33,9 @@ class Configuration:
 
     def get_db_url(self):
         return self._config["db_url"]
+
+    def get_initial_state(self):
+        return self._config['initial_state']
 
 
 # def setup_logging_config(self):
