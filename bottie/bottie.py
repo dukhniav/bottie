@@ -58,5 +58,14 @@ class Bottie:
                        'quote': self.finnhub_api.get_quote(ticker)}
         return quote
 
+    def reload_config() -> bool:
+        status = True
+        try:
+            config.reload_config()
+        except:
+            status = False
+
+        return status
+
 
 bottie = Bottie()

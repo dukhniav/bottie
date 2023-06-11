@@ -34,7 +34,11 @@ def get_available_funds():
 
 
 def reload_config():
-    return MenuOptions.CONFIG_RELOAD
+    msg = 'Configuration reloaded'
+    fail_masg = "Failed to reload configuration."
+    if bottie.reload_config():
+        return format_result(msg)
+    return format_result(fail_masg)
 
 
 def view_tickers():

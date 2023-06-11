@@ -40,6 +40,12 @@ class Configuration:
     def get_initial_state(self):
         return self._config['initial_state']
 
+    def reload_config(self):
+        """
+        Reload configuration files.
+        """
+        self._load_config()
+
     # API config
     def get_finnhub_credentials(self) -> list:
         _finnhub = self._credentials['finnhub']
