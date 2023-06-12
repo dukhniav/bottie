@@ -90,6 +90,9 @@ class Configuration:
         return self._config["paper_starting_balance"]
 
     # Operation config
+    def get_market_data_source(self):
+        return constants.MARKET_DATA
+
     def is_paper_trading(self):
         return self._config["paper_trading"]
 

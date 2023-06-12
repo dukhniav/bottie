@@ -13,11 +13,17 @@ class Worker:
         self._stop_event = threading.Event()
         self._worker_thread = None  # Initialize the worker thread variable
 
+    # def start(self) -> bool:
+    #     logger.info("Starting worker...")
+    #     self._stop_event.clear()
+    #     self._worker_thread = threading.Thread(target=self._worker_loop)
+    #     self._worker_thread.start()
+    #     status = True
+    #     return status
+
     def start(self) -> bool:
         logger.info("Starting worker...")
-        self._stop_event.clear()
-        self._worker_thread = threading.Thread(target=self._worker_loop)
-        self._worker_thread.start()
+        self._worker_loop
         status = True
         return status
 
@@ -26,6 +32,9 @@ class Worker:
         if self._worker_thread:
             self._worker_thread.join()  # Wait for the worker thread to finish
 
+    def market_data_source(self, source):
+        self.md = source
+
     # def stop(self) -> bool:
     #     logger.info("Stopping worker...")
     #     self._stop_event.set()
@@ -33,6 +42,13 @@ class Worker:
     #     self._worker_thread = None  # Reset the worker thread variable
     #     status = True
     #     return status
+
+    # def _worker_loop(self):
+
+    #     while not self._stop_event.is_set():
+    #         # Perform worker tasks
+    #         time.sleep(1)  # Example: Simulate some work
+    #     logger.info("Worker stopped.")
 
     def _worker_loop(self):
 

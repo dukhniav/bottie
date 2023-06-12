@@ -51,6 +51,9 @@ class Bottie:
 
     # Main menu manager
     def start_worker(self):
+        status = self.worker.start()
+        if status:
+            self.worker.market_data_source(self.finnhub_api)
         return self.worker.start()
 
     def stop_worker(self):

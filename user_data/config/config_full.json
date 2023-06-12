@@ -1,1 +1,71 @@
-{"max_open_trades": 3, "tradable_balance_ratio": 0.99, "amount_reserve_percent": 0.05, "paper_trading": true, "paper_starting_balance": 1000, "cancel_open_orders_on_exit": false, "timeframe": "5m", "trailing_stop": false, "trailing_stop_positive": 0.005, "trailing_stop_positive_offset": 0.0051, "trailing_only_offset_is_reached": false, "use_exit_signal": true, "trading_mode": "spot", "stoploss": -0.1, "unfilledtimeout": {"entry": 10, "exit": 10, "exit_timeout_count": 0, "unit": "minutes"}, "order_types": {"entry": "limit", "exit": "limit", "emergency_exit": "market", "force_exit": "market", "force_entry": "market", "stoploss": "market", "stoploss_on_exchange": false, "stoploss_price_type": "last", "stoploss_on_exchange_interval": 60, "stoploss_on_exchange_limit_ratio": 0.99}, "order_time_in_force": {"entry": "GTC", "exit": "GTC"}, "tickers": ["AAPL", "MSF", "GOOG", "FORD"], "exchange": {"name": "binance", "key": "your_exchange_key", "secret": "your_exchange_secret", "password": "", "log_responses": false, "ticker_whitelist": [], "ticker_blacklist": [], "outdated_offset": 5, "markets_refresh_interval": 60}, "bot_name": "bottie", "db_url": "sqlite:///./user_data/data/bottie_db.sqlite", "initial_state": "stopped", "force_entry_enable": false, "internals": {"process_throttle_secs": 5, "heartbeat_interval": 60}, "disable_dataframe_checks": false, "strategy": "SampleStrategy", "strategy_path": "user_data/strategies/", "recursive_strategy_search": false, "add_config_files": [], "reduce_df_footprint": false, "dataformat_ohlcv": "json", "dataformat_trades": "jsongz"}
+{
+    "max_open_trades": 3,
+    "tradable_balance_ratio": 0.99,
+    "amount_reserve_percent": 0.05,
+    "paper_trading": true,
+    "paper_starting_balance": 1000,
+    "cancel_open_orders_on_exit": false,
+    "timeframe": "5m",
+    "trailing_stop": false,
+    "trailing_stop_positive": 0.005,
+    "trailing_stop_positive_offset": 0.0051,
+    "trailing_only_offset_is_reached": false,
+    "use_exit_signal": true,
+    "trading_mode": "spot",
+    "stoploss": -0.1,
+    "unfilledtimeout": {
+        "entry": 10,
+        "exit": 10,
+        "exit_timeout_count": 0,
+        "unit": "minutes"
+    },
+    "order_types": {
+        "entry": "limit",
+        "exit": "limit",
+        "emergency_exit": "market",
+        "force_exit": "market",
+        "force_entry": "market",
+        "stoploss": "market",
+        "stoploss_on_exchange": false,
+        "stoploss_price_type": "last",
+        "stoploss_on_exchange_interval": 60,
+        "stoploss_on_exchange_limit_ratio": 0.99
+    },
+    "order_time_in_force": {
+        "entry": "GTC",
+        "exit": "GTC"
+    },
+    "tickers": [
+        "AAPL",
+        "MSF",
+        "GOOG",
+        "FORD"
+    ],
+    "exchange": {
+        "name": "binance",
+        "key": "your_exchange_key",
+        "secret": "your_exchange_secret",
+        "password": "",
+        "log_responses": false,
+        "ticker_whitelist": [],
+        "ticker_blacklist": [],
+        "outdated_offset": 5,
+        "markets_refresh_interval": 60
+    },
+    "bot_name": "bottie",
+    "db_url": "sqlite:///./user_data/data/bottie_db.sqlite",
+    "initial_state": "stopped",
+    "force_entry_enable": false,
+    "internals": {
+        "process_throttle_secs": 5,
+        "heartbeat_interval": 60
+    },
+    "disable_dataframe_checks": false,
+    "strategy": "SampleStrategy",
+    "strategy_path": "user_data/strategies/",
+    "recursive_strategy_search": false,
+    "add_config_files": [],
+    "reduce_df_footprint": false,
+    "dataformat_ohlcv": "json",
+    "dataformat_trades": "jsongz"
+}
