@@ -18,6 +18,7 @@ class MenuOptions(Enum):
     CONFIG_ADD_TICKER = 'add ticker'
     CONFIG_VIEW_TICKERS = 'view tickers'
     CONFIG_REMOVE_TICKER = 'remove ticker'
+    CONFIG_UPDATE_TICKER = "update ticker"
 
     MANUAL = 'manual'
     MANUAL_QUOTE = 'get quote'
@@ -25,4 +26,5 @@ class MenuOptions(Enum):
     MANUAL_PENDING = 'check pending'
     MANUAL_GET_TRADES = 'get 10 last trades'
 
+    RESTART_BOTTIE = 'restart bottie'
     QUIT_BOTTIE = 'quit bottie'

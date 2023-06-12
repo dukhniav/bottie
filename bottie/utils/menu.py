@@ -2,11 +2,12 @@ import os
 import threading
 import getch
 
-from typing import Dict
+from typing import Dict, List
 
 from bottie.enums.menu_options import MenuOptions
 
 from bottie.bottie import bottie
+from bottie.configuration.configuration import config
 
 
 def start_worker():
@@ -36,21 +37,46 @@ def get_available_funds():
 def reload_config():
     msg = 'Configuration reloaded'
     fail_masg = "Failed to reload configuration."
-    if bottie.reload_config():
+    if config.reload_config():
         return format_result(msg)
     return format_result(fail_masg)
 
 
-def view_tickers():
-    return MenuOptions.CONFIG_VIEW_TICKERS
+def view_tickers() -> str:
+    tickers = config.get_tickers()
+    msg = "Tickers:\n"
+    for ticker in tickers:
+        msg += f"  - {ticker}\n"
+    return format_result(msg)
 
 
-def add_ticker():
-    return MenuOptions.CONFIG_ADD_TICKER
+def add_ticker() -> str:
+    ticker = input("New ticker: ")
+    config.add_ticker(ticker)
+    msg = f"Ticker '{ticker}' added successfully."
+    return format_result(msg)
 
 
-def remove_ticker():
-    return MenuOptions.CONFIG_REMOVE_TICKER
+def remove_ticker() -> str:
+    ticker = input("Ticker to remove: ")
+
+    if config.delete_ticker(ticker):
+        msg = f"Ticker '{ticker}' removed successfully."
+        return format_result(msg)
+    else:
+        msg = f"Failed to remove ticker '{ticker}'."
+        return format_result(msg)
+
+
+def update_ticker() -> str:
+    old_ticker = input("Ticker to rename: ")
+    new_ticker = input("Updated ticker: ")
+    if config.update_ticker(old_ticker, new_ticker):
+        msg = f"Ticker '{old_ticker}' updated to '{new_ticker}' successfully."
+        return format_result(msg)
+    else:
+        msg = f"Failed to update ticker '{old_ticker}' to '{new_ticker}'."
+        return format_result(msg)
 
 
 def get_quote():
@@ -82,14 +108,16 @@ menu = {
         1: (MenuOptions.CONFIG_RELOAD.value, reload_config),
         2: (MenuOptions.CONFIG_VIEW_TICKERS.value, view_tickers),
         3: (MenuOptions.CONFIG_ADD_TICKER.value, add_ticker),
-        4: (MenuOptions.CONFIG_REMOVE_TICKER.value, remove_ticker)
+        4: (MenuOptions.CONFIG_REMOVE_TICKER.value, remove_ticker),
+        4: (MenuOptions.CONFIG_UPDATE_TICKER.value, update_ticker)
     }),
     5: (MenuOptions.MANUAL.value, {
         1: (MenuOptions.MANUAL_QUOTE.value, get_quote),
         2: (MenuOptions.MANUAL_TRADE.value, submit_manual_trade),
         3: (MenuOptions.MANUAL_PENDING.value, view_pending_trades),
         4: (MenuOptions.MANUAL_GET_TRADES.value, get_last_trades)
-    })}
+    }),
+    9: (MenuOptions.RESTART_BOTTIE.value, bottie.restart_bot)}
 
 
 def display_menu(menu_options, indent=0, is_outermost_menu=False):

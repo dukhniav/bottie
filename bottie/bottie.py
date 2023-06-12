@@ -1,9 +1,16 @@
 import logging
+import threading
+import time
 
 from typing import Dict
 
+from bottie import __version__
+
 from bottie.managers.account_manager import AccountManager
 from bottie.helpers.db_helper import initialize_models
+
+from bottie.utils.gc_setup import gc_set_threshold
+
 
 from bottie.worker import Worker
 
@@ -47,7 +54,8 @@ class Bottie:
         return self.worker.start()
 
     def stop_worker(self):
-        return self.worker.stop()
+        logger.info("Stopping worker...")
+        return self.worker.stop() if self.worker else False
 
     def show_available_funds(self):
         return self.account.get_account_available_funds()
@@ -66,6 +74,29 @@ class Bottie:
             status = False
 
         return status
+
+    def restart_bot(self):
+        # Stop the worker thread
+        stop_worker_thread = threading.Thread(target=self.stop_worker)
+        stop_worker_thread.start()
+        stop_worker_thread.join()
+
+        # Optionally perform any additional cleanup or shutdown tasks here
+
+        # Wait for a brief moment to ensure the worker is fully stopped
+        time.sleep(1)
+
+        # Perform any necessary setup before starting the bot again
+        self._setup()
+
+        logger.info(f"bottie {__version__}")
+        gc_set_threshold()
+
+        # Start the worker thread again
+        start_worker_thread = threading.Thread(target=self.start_worker)
+        start_worker_thread.start()
+
+        logger.info("Bot restarted.")
 
 
 bottie = Bottie()
