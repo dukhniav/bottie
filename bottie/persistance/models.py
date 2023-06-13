@@ -1,5 +1,7 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
+from bottie.persistance.base import ModelBase
+from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, Enum
 from sqlalchemy.orm import sessionmaker, relationship
+from enum import Enum as PyEnum
 
 from bottie.configuration.configuration import config
 from bottie.constants import DEFAULT_ACCOUNT_NAME, DEFAULT_PORTFOLIO_NAME
@@ -9,7 +11,9 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-from bottie.persistance.base import ModelBase
+class TransactionType(PyEnum):
+    PENDING = "pending"
+    PROCESSED = "processed"
 
 
 class Portfolio(ModelBase):
@@ -47,15 +51,17 @@ class Transaction(ModelBase):
     symbol = Column(String)
     quantity = Column(Integer)
     price = Column(Float)
+    type = Column(Enum(TransactionType), default=TransactionType.PENDING)
     account_id = Column(Integer, ForeignKey("accounts.id"))
     account = relationship("Account", back_populates="transactions")
 
     def __repr__(self):
-        return f"Transaction(id={self.id}, symbol='{self.symbol}', quantity={self.quantity}, price={self.price})"
+        return f"Transaction(id={self.id}, symbol='{self.symbol}', quantity={self.quantity}, price={self.price}, type='{self.type}')"
 
     def process_transaction(self):
         total_cost = self.quantity * self.price
         self.account.available_funds -= total_cost
+        self.type = TransactionType.PROCESSED
         session.commit()
 
 

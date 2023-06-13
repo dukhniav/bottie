@@ -1,5 +1,6 @@
 import finnhub
 import logging
+import datetime
 
 from typing import Dict
 
@@ -28,6 +29,7 @@ class Finnhub:
 
         temp_quote = self.client.quote(symbol=ticker)
         quote: Dict = {
+            "ticker": ticker,
             "price": temp_quote.get("c"),
             "delta": temp_quote.get("d"),
             "delta_percent": temp_quote.get("dp"),
@@ -35,6 +37,7 @@ class Finnhub:
             "low": temp_quote.get("l"),
             "open": temp_quote.get("o"),
             "close_prev": temp_quote.get("pc"),
+            "timestamp": datetime.now()
         }
 
         return quote
