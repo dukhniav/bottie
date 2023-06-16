@@ -1,0 +1,6 @@
+========================================
+Overall Performance Metrics:
+Total Trades: 395
+Positive Trades: 395
+Negative Trades: 0
+Average Profit: [0.01245871]
