@@ -17,6 +17,12 @@ class Finnhub:
         # Setup client
         self.client = finnhub.Client(api_key=_api_key)
 
+    def get_historical_data(self, symbol, start_date, end_date):
+        data = None
+        data = self.client.stock_candles(
+            symbol=symbol, resolution=config.get_default_timeframe, _from=start_date, to=end_date)
+        return data
+
     def get_quote(self, ticker: str):
         """Get current ticker price
 

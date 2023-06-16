@@ -102,6 +102,9 @@ class Configuration:
     def get_initial_state(self):
         return self._config['initial_state']
 
+    def get_default_timeframe(self):
+        return self._config['timeframe']
+
     # API config
 
     def get_finnhub_credentials(self) -> list:

@@ -5,7 +5,7 @@
     "paper_trading": true,
     "paper_starting_balance": 1000,
     "cancel_open_orders_on_exit": false,
-    "timeframe": "5m",
+    "timeframe": 5,
     "trailing_stop": false,
     "trailing_stop_positive": 0.005,
     "trailing_stop_positive_offset": 0.0051,
