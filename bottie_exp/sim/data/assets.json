@@ -1,0 +1,11 @@
+{
+    "MSFT": {
+        "quantity": 150
+    },
+    "AAPL": {
+        "quantity": 30
+    },
+    "GOOG": {
+        "quantity": 1
+    }
+}
