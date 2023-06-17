@@ -12,12 +12,14 @@ BALANCE_LOW_ERR = 'Balance too low to cover transaction.'
 BALANCE_UPDATE_ERR = 'Error updating balance file.'
 BALANCE_GET_ERR = 'Unable to get balance.'
 BALANCE_FILE_ERR = 'Cannot find balance file.'
+BALANCE_ROLLBACK = 'Rolled back transaction balance.'
 
 # Asset error handling
 ASSET_UPDATE_ERR = 'Error updating asset file.'
 ASSET_GET_ERR = 'Unable to get assets.'
 ASSET_FILE_ERR = 'Cannot find asset file.'
 ASSET_NO_ASSETS = 'No assets to display.'
+ASSET_ROLLBACK = 'Rolled back transaction assets.'
 
 # Transaction error handling
 TRX_UPDATE_ERR = 'Error updating transactions file.'
@@ -30,6 +32,7 @@ TRX_MSG_CREATE_ERR = 'Something went wrong with generating order message...'
 INVALID_TICKER_ERR = 'Invalid ticker'
 TRX_NEXT_ID = 'Error generating next transaction id.'
 TRX_TRX_BY_TICKER = 'Unable to retrieve transactions for ticker.'
+TRX_ROLLBACK = 'Rolled back transactions'
 
 
 def display_err(error_msg) -> bool:

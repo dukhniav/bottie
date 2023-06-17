@@ -1,7 +1,7 @@
 import json
 import os
 
-from constants import display_err, BALANCE_LOW_ERR, BALANCE_UPDATE_ERR, BALANCE_GET_ERR, BALANCE_FILE_ERR
+from constants import display_err, BALANCE_LOW_ERR, BALANCE_UPDATE_ERR, BALANCE_GET_ERR, BALANCE_FILE_ERR, BALANCE_ROLLBACK
 
 BALANCE_FILE_PATH = 'data/balance.json'
 
@@ -79,3 +79,8 @@ class PortfolioManager:
             status = self.save_balance()
 
         return status
+
+    def rollback_transaction(self, balance: float):
+        self.balance = balance
+        self.save_balance()
+        display_err(BALANCE_ROLLBACK)

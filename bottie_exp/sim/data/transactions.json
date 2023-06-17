@@ -1,1 +1,93 @@
-{"1": {"symbol": "GOOG", "action": "buy", "quantity": 1, "price": 124.06, "timestamp": "2023-06-16T17:45:54.652632"}, "2": {"symbol": "MSFT", "action": "buy", "quantity": 2, "price": 342.33, "timestamp": "2023-06-16T17:46:39.794825"}, "3": {"symbol": "GOOG", "action": "buy", "quantity": 3, "price": 124.06, "timestamp": "2023-06-16T18:01:38.363835"}, "4": {"symbol": "GOOG", "action": "sell", "quantity": 1, "price": 124.06, "timestamp": "2023-06-17T14:18:24.572039"}, "5": {"symbol": "GOOG", "action": "sell", "quantity": 1, "price": 124.06, "timestamp": "2023-06-17T14:19:15.074421"}, "6": {"symbol": "GOOG", "action": "sell", "quantity": 1, "price": 124.06, "timestamp": "2023-06-17T14:27:51.970089"}, "7": {"symbol": "GOOG", "action": "sell", "quantity": 1, "price": 124.06, "timestamp": "2023-06-17T14:29:51.954155"}, "8": {"symbol": "GOOG", "action": "buy", "quantity": 1, "price": 124.06, "timestamp": "2023-06-17T14:32:07.663016"}, "9": {"symbol": "AAPL", "action": "buy", "quantity": 1, "price": 184.92, "timestamp": "2023-06-17T14:35:00.995374"}, "10": {"symbol": "GOOG", "action": "sell", "quantity": 1, "price": 124.06, "timestamp": "2023-06-17T14:35:50.071206"}, "11": {"symbol": "AAPL", "action": "buy", "quantity": 1, "price": 184.92, "timestamp": "2023-06-17T14:37:22.912364"}, "12": {"symbol": "AAPL", "action": "sell", "quantity": 1, "price": 184.92, "timestamp": "2023-06-17T14:38:07.338338"}, "13": {"symbol": "AAPL", "action": "buy", "quantity": 1, "price": 184.92, "timestamp": "2023-06-17T15:44:37.023041"}}
+{
+    "1": {
+        "symbol": "GOOG",
+        "action": "buy",
+        "quantity": 1,
+        "price": 124.06,
+        "timestamp": "2023-06-16T17:45:54.652632"
+    },
+    "2": {
+        "symbol": "MSFT",
+        "action": "buy",
+        "quantity": 2,
+        "price": 342.33,
+        "timestamp": "2023-06-16T17:46:39.794825"
+    },
+    "3": {
+        "symbol": "GOOG",
+        "action": "buy",
+        "quantity": 3,
+        "price": 124.06,
+        "timestamp": "2023-06-16T18:01:38.363835"
+    },
+    "4": {
+        "symbol": "GOOG",
+        "action": "sell",
+        "quantity": 1,
+        "price": 124.06,
+        "timestamp": "2023-06-17T14:18:24.572039"
+    },
+    "5": {
+        "symbol": "GOOG",
+        "action": "sell",
+        "quantity": 1,
+        "price": 124.06,
+        "timestamp": "2023-06-17T14:19:15.074421"
+    },
+    "6": {
+        "symbol": "GOOG",
+        "action": "sell",
+        "quantity": 1,
+        "price": 124.06,
+        "timestamp": "2023-06-17T14:27:51.970089"
+    },
+    "7": {
+        "symbol": "GOOG",
+        "action": "sell",
+        "quantity": 1,
+        "price": 124.06,
+        "timestamp": "2023-06-17T14:29:51.954155"
+    },
+    "8": {
+        "symbol": "GOOG",
+        "action": "buy",
+        "quantity": 1,
+        "price": 124.06,
+        "timestamp": "2023-06-17T14:32:07.663016"
+    },
+    "9": {
+        "symbol": "AAPL",
+        "action": "buy",
+        "quantity": 1,
+        "price": 184.92,
+        "timestamp": "2023-06-17T14:35:00.995374"
+    },
+    "10": {
+        "symbol": "GOOG",
+        "action": "sell",
+        "quantity": 1,
+        "price": 124.06,
+        "timestamp": "2023-06-17T14:35:50.071206"
+    },
+    "11": {
+        "symbol": "AAPL",
+        "action": "buy",
+        "quantity": 1,
+        "price": 184.92,
+        "timestamp": "2023-06-17T14:37:22.912364"
+    },
+    "12": {
+        "symbol": "AAPL",
+        "action": "sell",
+        "quantity": 1,
+        "price": 184.92,
+        "timestamp": "2023-06-17T14:38:07.338338"
+    },
+    "13": {
+        "symbol": "AAPL",
+        "action": "buy",
+        "quantity": 1,
+        "price": 184.92,
+        "timestamp": "2023-06-17T15:44:37.023041"
+    }
+}

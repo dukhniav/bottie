@@ -7,7 +7,7 @@ from finnhub_api import finnhub_api
 
 from enums import OrderSide, OrderType
 
-from constants import display_err, ASSET_FILE_ERR, ASSET_GET_ERR, ASSET_UPDATE_ERR
+from constants import display_err, ASSET_FILE_ERR, ASSET_GET_ERR, ASSET_UPDATE_ERR, ASSET_ROLLBACK
 ASSETS_FILE = 'data/assets.json'
 
 
@@ -80,3 +80,8 @@ class AssetManager:
         except:
             status = False
         return status
+
+    def rollback_transaction(self, assets):
+        self.assets = assets
+        self.save_assets()
+        display_err(ASSET_ROLLBACK)

@@ -11,7 +11,7 @@ from enums import OrderSide, OrderType
 from finnhub_api import finnhub_api
 
 from constants import format_percent, format_currency, display_err
-from constants import TRX_UPDATE_ERR, TRX_FILE_ERR, TRX_GET_ERR, TRX_CREATE_ERR, TRX_MSG_CREATE_ERR, TRX_NEXT_ID, TRX_SAVE_ERR, TRX_TRX_BY_TICKER, INVALID_TICKER_ERR
+from constants import TRX_ROLLBACK, TRX_UPDATE_ERR, TRX_FILE_ERR, TRX_GET_ERR, TRX_CREATE_ERR, TRX_MSG_CREATE_ERR, TRX_NEXT_ID, TRX_SAVE_ERR, TRX_TRX_BY_TICKER, INVALID_TICKER_ERR
 
 TRANSACTIONS_FILE = 'data/transactions.json'
 
@@ -161,7 +161,19 @@ class TransactionManager:
 
         return all_performance
 
+    def rollback_transaction(self, trx, assets, balance):
+        self.transactions = trx
+        self.save_transactions()
+        display_err(TRX_ROLLBACK)
+
+        self.assets.rollback_transaction(assets)
+        self.portfolio.rollback_transaction(balance)
+
     def record_transaction(self, symbol: str, quantity: int, action: OrderSide, _type: OrderType = OrderType.MARKET.value) -> bool:
+        og_trx = self.transactions
+        og_assets = AssetManager.get_assets()
+        og_balance = PortfolioManager.get_balance()
+
         # Create transaction
         status = True
         symbol = symbol.upper()
@@ -234,5 +246,6 @@ class TransactionManager:
         else:
             err = TRX_SAVE_ERR
 
+        self.rollback_transaction(og_trx, og_assets, og_balance)
         print(err)
         return False
