@@ -33,10 +33,13 @@ class PortfolioManager:
             json.dump(balance, file)
 
     def update_balance(self, amount) -> bool:
-        try:
-            bal = self.balance
-            self.balance = bal + amount
-            self.save_balance(self.balance)
-            return True
-        except:
+        if self.balance >= amount:
+            try:
+                bal = self.balance
+                self.balance = bal + amount
+                self.save_balance(self.balance)
+                return True
+            except:
+                return False
+        else:
             return False

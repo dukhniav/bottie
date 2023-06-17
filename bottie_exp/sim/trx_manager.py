@@ -12,6 +12,13 @@ from finnhub_api import finnhub_api
 
 TRANSACTIONS_FILE = 'data/transactions.json'
 
+TRX_CREATE_ERR = 'Something went wrong with creating the transaction...'
+TRX_SAVE_ERR = 'Something went wrong with saving transactions...'
+ASSET_UPDATE_ERR = 'Somethign went wrong with updating assets...'
+MSG_CREATE_ERR = 'Something went wrong with generating order message...'
+PRT_UPDATE_ERR = ' updating balance...'
+INVALID_TICKER_ERR = ' Invalid ticker'
+
 
 class TransactionManager:
     def __init__(self, asset_mng: AssetManager, prt_mng: PortfolioManager):
@@ -130,53 +137,75 @@ class TransactionManager:
 
     def record_transaction(self, symbol: str, quantity: int, action: OrderSide, _type: OrderType = OrderType.MARKET.value) -> bool:
         # Create transaction
-        status = None
+        status = True
         symbol = symbol.upper()
+        temp_trx = self.transactions
 
         try:
             price = finnhub_api.get_quote(symbol)['price']
         except:
-            print(f'Invalid stock ticker: {symbol}')
+            print(f'{INVALID_TICKER_ERR}: {symbol}')
+            status = False
 
         msg = ''
 
-        next_id = self.get_next_id()
+        if status:
+            try:
+                next_id = self.get_next_id()
 
-        transaction = {
-            'symbol': symbol,
-            'action': action.value,
-            'quantity': quantity,
-            'price': price,
-            'timestamp': datetime.now().isoformat()
-        }
+                transaction = {
+                    'symbol': symbol,
+                    'action': action.value,
+                    'quantity': quantity,
+                    'price': price,
+                    'timestamp': datetime.now().isoformat()
+                }
 
-        self.transactions[next_id] = transaction
-
-        # Save transaction
-        status = self.save_transactions()
+                temp_trx[next_id] = transaction
+            except:
+                print(TRX_CREATE_ERR)
+                status = False
 
         if status:
-            total = quantity * price
-            formatted_total = f'{total:,.2f}'
-            formatted_price = f'{price:,.2f}'
+            try:
+                total = quantity * price
+                formatted_total = f'{total:,.2f}'
+                formatted_price = f'{price:,.2f}'
 
-            # Generate message
-            if action == OrderSide.BUY:
-                msg = f"Submitting BUY ({_type}) order of {quantity} of {symbol} @ ${formatted_price} (${formatted_total})."
-                total = -1 * total
-            elif action == OrderSide.SELL:
-                msg = f"Selling {quantity} of {symbol} @ ${formatted_price} (${formatted_total})."
+                # Generate message
+                if action == OrderSide.BUY:
+                    msg = f"Submitting BUY ({_type}) order of {quantity} of {symbol} @ ${formatted_price} (${formatted_total})."
+                    total = -1 * total
+                elif action == OrderSide.SELL:
+                    msg = f"Selling {quantity} of {symbol} @ ${formatted_price} (${formatted_total})."
 
-            # Save assets
+            except:
+                print()
+
+        # Save assets
+        if status:
             status = self.assets.update_assets(action, symbol, quantity)
+        else:
+            err = MSG_CREATE_ERR
 
         # Update portfolio balance
         if status:
             status = self.portfolio.update_balance(total)
+        else:
+            err = ASSET_UPDATE_ERR
+
+        if status:
+            # Save transaction
+            self.transactions = temp_trx
+            status = self.save_transactions()
+        else:
+            err = PRT_UPDATE_ERR
 
         if status:
             print(msg)
             return True
+        else:
+            err = TRX_SAVE_ERR
 
-        print("\n    Something went wrong, couldn't process order.")
+        print(err)
         return False
