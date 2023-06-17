@@ -7,39 +7,30 @@ from finnhub_api import finnhub_api
 
 from enums import OrderSide, OrderType
 
+from constants import display_err, ASSET_FILE_ERR, ASSET_GET_ERR, ASSET_UPDATE_ERR
 ASSETS_FILE = 'data/assets.json'
 
 
 class AssetManager:
     def __init__(self):
-        self.assets = self.load_assets()
+        self.assets = self.get_assets()
 
     @staticmethod
-    def get_assets():
-        assets: Dict = AssetManager.load_assets()
-        msg = None
-
-        if assets:
-            msg = f'Currently owned assets:'
-            for asset in assets:
-                msg += '\n' + ' ' * 4 + \
-                    asset + ' - ' + str(assets[asset]['quantity'])
-        else:
-            msg = 'No owned assets.'
-
-        return msg
-
-    @staticmethod
-    def load_assets():
+    def get_assets() -> Dict:
+        err = ''
         data = {}
-        if os.path.exists(ASSETS_FILE):
+        if not os.path.exists(ASSETS_FILE):
+            err = ASSET_FILE_ERR
+        else:
             try:
                 with open(ASSETS_FILE) as file:
                     data = json.load(file)
                 file.close()
             except json.JSONDecodeError:
-                return data
+                err = ASSET_GET_ERR
 
+        if err:
+            display_err(err)
         return data
 
     def save_assets(self):

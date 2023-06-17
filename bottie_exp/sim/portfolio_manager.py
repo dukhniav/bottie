@@ -1,45 +1,81 @@
 import json
 import os
 
-BALANCE_FILE = 'data/balance.json'
+from constants import display_err, BALANCE_LOW_ERR, BALANCE_UPDATE_ERR, BALANCE_GET_ERR, BALANCE_FILE_ERR
+
+BALANCE_FILE_PATH = 'data/balance.json'
 
 
 class PortfolioManager:
     def __init__(self):
-        self.balance = self._load_balance()
+        self.balance = self.get_balance()
 
     @staticmethod
-    def _load_balance():
-        if os.path.exists(BALANCE_FILE):
-            with open(BALANCE_FILE) as file:
-                balance = json.load(file)
-            return balance['balance']
-        return 0
-
-    @staticmethod
-    def get_balance():
-        balance = PortfolioManager._load_balance()
-
-        formatted_balance = f'{balance:,.2f}'
-
-        msg = f"Current balance: ${formatted_balance}."
-        return msg
-
-    def save_balance(self, new_balance):
-        balance = {
-            "balance": new_balance
-        }
-        with open(BALANCE_FILE, 'w') as file:
-            json.dump(balance, file)
-
-    def update_balance(self, amount) -> bool:
-        if self.balance >= amount:
-            try:
-                bal = self.balance
-                self.balance = bal + amount
-                self.save_balance(self.balance)
-                return True
-            except:
-                return False
+    def get_balance() -> float:
+        balance = float(0)
+        err = ''
+        if not os.path.exists(BALANCE_FILE_PATH):
+            err = BALANCE_FILE_ERR
         else:
-            return False
+            try:
+                with open(BALANCE_FILE_PATH) as file:
+                    data = json.load(file)
+                    balance = data['balance']
+            except:
+                err = BALANCE_GET_ERR
+
+        if err:
+            display_err(err)
+
+        return balance
+
+    def save_balance(self) -> bool:
+        status = True
+        err = ''
+
+        new_balance = {
+            'balance': self.balance
+        }
+        if not os.path.exists(BALANCE_FILE_PATH):
+            err = BALANCE_FILE_ERR
+        else:
+            try:
+                with open(BALANCE_FILE_PATH, 'w') as file:
+                    json.dump(new_balance, file)
+            except:
+                err = BALANCE_UPDATE_ERR
+
+        if err:
+            status = display_err(err)
+
+        return status
+
+    def update_balance(self, trx_amt: float) -> bool:
+        """update balance
+
+        Args:
+            trx_amt (float): amount to update balance by
+
+        Returns: status
+        """
+        status = True
+        err = ''
+
+        buy = trx_amt < 0
+        cur_balance = self.balance
+
+        if buy:
+            if cur_balance >= trx_amt:
+                cur_balance += trx_amt
+            else:
+                err = BALANCE_LOW_ERR
+        else:
+            cur_balance += trx_amt
+
+        if err:
+            status = display_err(err)
+        else:
+            self.balance = cur_balance
+            status = self.save_balance()
+
+        return status

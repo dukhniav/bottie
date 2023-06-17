@@ -1,7 +1,7 @@
 import json
 import os
 from datetime import datetime
-from typing import Dict
+from typing import Dict, AnyStr
 
 from asset_manager import AssetManager
 from portfolio_manager import PortfolioManager
@@ -10,14 +10,10 @@ from enums import OrderSide, OrderType
 
 from finnhub_api import finnhub_api
 
-TRANSACTIONS_FILE = 'data/transactions.json'
+from constants import format_percent, format_currency, display_err
+from constants import TRX_UPDATE_ERR, TRX_FILE_ERR, TRX_GET_ERR, TRX_CREATE_ERR, TRX_MSG_CREATE_ERR, TRX_NEXT_ID, TRX_SAVE_ERR, TRX_TRX_BY_TICKER, INVALID_TICKER_ERR
 
-TRX_CREATE_ERR = 'Something went wrong with creating the transaction...'
-TRX_SAVE_ERR = 'Something went wrong with saving transactions...'
-ASSET_UPDATE_ERR = 'Somethign went wrong with updating assets...'
-MSG_CREATE_ERR = 'Something went wrong with generating order message...'
-PRT_UPDATE_ERR = ' updating balance...'
-INVALID_TICKER_ERR = ' Invalid ticker'
+TRANSACTIONS_FILE = 'data/transactions.json'
 
 
 class TransactionManager:
@@ -25,60 +21,81 @@ class TransactionManager:
         self.assets = asset_mng
         self.portfolio = prt_mng
         self.type = None
-        self.transactions = self.load_transactions()
+        self.transactions = self.get_transactions()
 
     @staticmethod
     def get_transactions():
-        trx = TransactionManager.load_transactions()
-        print(f'Transactions: {trx}')
+        err = ''
+        data = {}
 
-    @staticmethod
-    def load_transactions():
-        if os.path.exists(TRANSACTIONS_FILE):
+        if not os.path.exists(TRANSACTIONS_FILE):
+            err = TRX_FILE_ERR
+        else:
             try:
                 with open(TRANSACTIONS_FILE) as file:
-                    return json.load(file)
+                    data = json.load(file)
+                file.close()
             except json.JSONDecodeError:
-                return {}
+                err = TRX_GET_ERR
+        if err:
+            display_err(err)
+
+        return data
 
     def save_transactions(self):
-        try:
-            with open(TRANSACTIONS_FILE, 'w') as file:
-                json.dump(self.transactions, file)
-            file.close()
-            return True
-        except:
-            return False
+        err = ''
+        status = True
+        if not os.path.exists(TRANSACTIONS_FILE):
+            err = TRX_FILE_ERR
+        else:
+            try:
+                with open(TRANSACTIONS_FILE, 'w') as file:
+                    json.dump(self.transactions, file)
+                file.close()
+            except:
+                err = TRX_UPDATE_ERR
+
+        if err:
+            status = False
+            display_err(err)
+
+        return status
 
     def get_next_id(self) -> str:
+        err = ''
+        next_id = None
         try:
-            with open(TRANSACTIONS_FILE, 'r') as file:
-                data = json.load(file)
-            file.close()
-
-            ids = [int(item) for item in data]
-            print(ids)
+            ids = [int(item) for item in self.transactions]
             if ids:
                 max_id = max(ids)
                 next_id = max_id + 1
             else:
                 next_id = 1
-        except json.JSONDecodeError:
-            next_id = str(1)
+        except:
+            err = TRX_NEXT_ID
 
-        return next_id
+        if err:
+            display_err(err)
+
+        return str(next_id)
 
     def get_transactions_for_ticker(self, ticker):
-        transactions = [
-            transaction
-            for transaction in self.transactions.values()
-            if transaction.get('symbol') == ticker
-        ]
+        err = ''
+        transactions = None
+
+        try:
+            transactions = [transaction for transaction in self.transactions.values(
+            ) if transaction.get('symbol') == ticker]
+        except:
+            err = TRX_TRX_BY_TICKER
+
+        if err:
+            display_err(err)
 
         return transactions
 
-    def get_stock_performance(self):
-        assets = self.assets.assets
+    def get_performance(self) -> str:
+        assets = AssetManager.get_assets()
         transactions = self.transactions
 
         stock_performance = {}
@@ -121,19 +138,28 @@ class TransactionManager:
 
         buy_total = 0
         cur_total = 0
+        s_performance = {}
         for x, y in stock_performance.items():
             symbol = y.get('symbol')
             price = y.get('price')
             qty = y.get('quantity')
-            cur_price = y.get('latest_price')['price'] + 10
+            cur_price = y.get('latest_price')['price']
             delta = cur_price / price
             buy_total += price * qty
             cur_total += cur_price * qty
+            performance = {
+                "buy_total":  price * qty,
+                "cur_total":  cur_price * qty,
+            }
+            s_performance[symbol] = performance
 
-            # print(symbol, price, qty, cur_price, delta)
-        direction = 'up' if cur_total > buy_total else 'down'
-        msg = f'\n    Portfolio {direction} by {buy_total/cur_total}%. Current worth: ${cur_total} ({direction} by ${cur_total - buy_total})'
-        return msg
+        all_performance = {
+            'total_buy': buy_total,
+            'total_current': cur_total,
+            'stocks': s_performance
+        }
+
+        return all_performance
 
     def record_transaction(self, symbol: str, quantity: int, action: OrderSide, _type: OrderType = OrderType.MARKET.value) -> bool:
         # Create transaction
@@ -169,37 +195,38 @@ class TransactionManager:
         if status:
             try:
                 total = quantity * price
-                formatted_total = f'{total:,.2f}'
-                formatted_price = f'{price:,.2f}'
+                formatted_total = format_currency(total)
+                formatted_price = format_currency(price)
+
+                if action == OrderSide.BUY:
+                    total = -1 * total
 
                 # Generate message
-                if action == OrderSide.BUY:
-                    msg = f"Submitting BUY ({_type}) order of {quantity} of {symbol} @ ${formatted_price} (${formatted_total})."
-                    total = -1 * total
-                elif action == OrderSide.SELL:
-                    msg = f"Selling {quantity} of {symbol} @ ${formatted_price} (${formatted_total})."
+                msg = f"\n    Submitting ({str(_type).upper()}) order to {action.value.upper()} {quantity} of {symbol} @ ${formatted_price} (total: ${formatted_total}).\n"
 
             except:
-                print()
+                err = TRX_MSG_CREATE_ERR
+                status = False
 
         # Save assets
         if status:
             status = self.assets.update_assets(action, symbol, quantity)
         else:
-            err = MSG_CREATE_ERR
+            err = TRX_MSG_CREATE_ERR
+            status = False
 
         # Update portfolio balance
         if status:
             status = self.portfolio.update_balance(total)
         else:
-            err = ASSET_UPDATE_ERR
+            status = False
 
         if status:
             # Save transaction
             self.transactions = temp_trx
             status = self.save_transactions()
         else:
-            err = PRT_UPDATE_ERR
+            status = False
 
         if status:
             print(msg)
