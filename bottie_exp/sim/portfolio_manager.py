@@ -32,6 +32,11 @@ class PortfolioManager:
         with open(BALANCE_FILE, 'w') as file:
             json.dump(balance, file)
 
-    def update_balance(self, amount):
-        self.balance += amount
-        self.save_balance(self.balance)
+    def update_balance(self, amount) -> bool:
+        try:
+            bal = self.balance
+            self.balance = bal + amount
+            self.save_balance(self.balance)
+            return True
+        except:
+            return False

@@ -3,6 +3,10 @@ import os
 
 from typing import Dict
 
+from finnhub_api import finnhub_api
+
+from enums import OrderSide, OrderType
+
 ASSETS_FILE = 'data/assets.json'
 
 
@@ -13,11 +17,15 @@ class AssetManager:
     @staticmethod
     def get_assets():
         assets: Dict = AssetManager.load_assets()
+        msg = None
 
-        msg = f'Currently owned assets:'
-        for asset in assets:
-            msg += '\n' + ' ' * 4 + \
-                asset + ' - ' + str(assets[asset]['quantity'])
+        if assets:
+            msg = f'Currently owned assets:'
+            for asset in assets:
+                msg += '\n' + ' ' * 4 + \
+                    asset + ' - ' + str(assets[asset]['quantity'])
+        else:
+            msg = 'No owned assets.'
 
         return msg
 
@@ -25,9 +33,13 @@ class AssetManager:
     def load_assets():
         data = {}
         if os.path.exists(ASSETS_FILE):
-            with open(ASSETS_FILE) as file:
-                data = json.load(file)
-            file.close()
+            try:
+                with open(ASSETS_FILE) as file:
+                    data = json.load(file)
+                file.close()
+            except json.JSONDecodeError:
+                return data
+
         return data
 
     def save_assets(self):
@@ -35,25 +47,45 @@ class AssetManager:
             json.dump(self.assets, file, indent=4)
         file.close()
 
-    def add_asset(self, symbol, quantity):
-        if symbol in self.assets:
-            self.assets[symbol]['quantity'] += quantity
+    def update_assets(self, side: OrderSide, symbol: str, quantity: int) -> bool:
+        status = None
+        if side == OrderSide.BUY:
+            status = self.add_asset(symbol, quantity)
         else:
-            asset = {}
-            asset['quantity'] = quantity
-            self.assets[symbol] = asset
+            status = self.remove_asset(symbol, quantity)
+        return status
 
-        self.save_assets()
-
-    def remove_asset(self, symbol, quantity):
-        print(f'sym: {symbol}, qty: {quantity}')
-        if symbol in self.assets:
-            if self.assets[symbol]['quantity'] >= quantity:
-                self.assets[symbol]['quantity'] -= quantity
-                if self.assets[symbol]['quantity'] == 0:
-                    del self.assets[symbol]
-                self.save_assets()
+    def add_asset(self, symbol, quantity) -> bool:
+        try:
+            if symbol in self.assets:
+                self.assets[symbol]['quantity'] += quantity
             else:
-                print(f"You don't have enough {symbol} to sell.")
-        else:
-            print(f"You don't own any {symbol}.")
+                asset = {}
+                asset['quantity'] = quantity
+                self.assets[symbol] = asset
+
+            self.save_assets()
+            return True
+        except:
+            return False
+
+    def remove_asset(self, symbol, quantity) -> bool:
+        status = True
+        try:
+            print(f'sym: {symbol}, qty: {quantity}')
+            if symbol in self.assets:
+                if self.assets[symbol]['quantity'] >= quantity:
+                    self.assets[symbol]['quantity'] -= quantity
+                    if self.assets[symbol]['quantity'] == 0:
+                        del self.assets[symbol]
+                    self.save_assets()
+
+                else:
+                    print(f"You don't have enough {symbol} to sell.")
+                    status = False
+            else:
+                print(f"You don't own any {symbol}.")
+                status = False
+        except:
+            status = False
+        return status

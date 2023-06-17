@@ -1,9 +1,14 @@
 import json
 import os
 from datetime import datetime
+from typing import Dict
 
 from asset_manager import AssetManager
 from portfolio_manager import PortfolioManager
+
+from enums import OrderSide, OrderType
+
+from finnhub_api import finnhub_api
 
 TRANSACTIONS_FILE = 'data/transactions.json'
 
@@ -23,39 +28,155 @@ class TransactionManager:
     @staticmethod
     def load_transactions():
         if os.path.exists(TRANSACTIONS_FILE):
-            with open(TRANSACTIONS_FILE) as file:
-                return json.load(file)
-        return []
+            try:
+                with open(TRANSACTIONS_FILE) as file:
+                    return json.load(file)
+            except json.JSONDecodeError:
+                return {}
 
     def save_transactions(self):
-        with open(TRANSACTIONS_FILE, 'w') as file:
-            json.dump(self.transactions, file, indent=4)
+        try:
+            with open(TRANSACTIONS_FILE, 'w') as file:
+                json.dump(self.transactions, file)
+            file.close()
+            return True
+        except:
+            return False
 
-    def record_transaction(self, symbol, action, quantity, price):
+    def get_next_id(self) -> str:
+        try:
+            with open(TRANSACTIONS_FILE, 'r') as file:
+                data = json.load(file)
+            file.close()
+
+            ids = [int(item) for item in data]
+            print(ids)
+            if ids:
+                max_id = max(ids)
+                next_id = max_id + 1
+            else:
+                next_id = 1
+        except json.JSONDecodeError:
+            next_id = str(1)
+
+        return next_id
+
+    def get_transactions_for_ticker(self, ticker):
+        transactions = [
+            transaction
+            for transaction in self.transactions.values()
+            if transaction.get('symbol') == ticker
+        ]
+
+        return transactions
+
+    def get_stock_performance(self):
+        assets = self.assets.assets
+        transactions = self.transactions
+
+        stock_performance = {}
+
+        for transaction_id, transaction in transactions.items():
+            symbol = transaction["symbol"]
+            action = transaction["action"]
+            quantity = transaction["quantity"]
+            price = transaction["price"]
+            timestamp = transaction["timestamp"]
+
+            if symbol in assets:
+                if action == "buy":
+                    if quantity <= assets[symbol]["quantity"]:
+                        assets[symbol]["quantity"] -= quantity
+                        stock_performance[transaction_id] = {
+                            "symbol": symbol,
+                            "quantity": quantity,
+                            "price": price,
+                            "timestamp": timestamp
+                        }
+                    else:
+                        remaining_quantity = assets[symbol]["quantity"]
+                        assets[symbol]["quantity"] = 0
+                        stock_performance[transaction_id] = {
+                            "symbol": symbol,
+                            "quantity": remaining_quantity,
+                            "price": price,
+                            "timestamp": timestamp
+                        }
+                elif action == "sell":
+                    assets[symbol]["quantity"] += quantity
+                    if symbol in stock_performance:
+                        del stock_performance[symbol]
+
+        for transaction_id, performance in stock_performance.items():
+            symbol = performance["symbol"]
+            latest_price = finnhub_api.get_quote(symbol)
+            performance["latest_price"] = latest_price
+
+        buy_total = 0
+        cur_total = 0
+        for x, y in stock_performance.items():
+            symbol = y.get('symbol')
+            price = y.get('price')
+            qty = y.get('quantity')
+            cur_price = y.get('latest_price')['price'] + 10
+            delta = cur_price / price
+            buy_total += price * qty
+            cur_total += cur_price * qty
+
+            # print(symbol, price, qty, cur_price, delta)
+        direction = 'up' if cur_total > buy_total else 'down'
+        msg = f'\n    Portfolio {direction} by {buy_total/cur_total}%. Current worth: ${cur_total} ({direction} by ${cur_total - buy_total})'
+        return msg
+
+    def record_transaction(self, symbol: str, quantity: int, action: OrderSide, _type: OrderType = OrderType.MARKET.value) -> bool:
+        # Create transaction
+        status = None
+        symbol = symbol.upper()
+
+        try:
+            price = finnhub_api.get_quote(symbol)['price']
+        except:
+            print(f'Invalid stock ticker: {symbol}')
+
         msg = ''
+
+        next_id = self.get_next_id()
+
         transaction = {
             'symbol': symbol,
-            'action': action,
+            'action': action.value,
             'quantity': quantity,
             'price': price,
             'timestamp': datetime.now().isoformat()
         }
 
-        self.transactions.append(transaction)
-        self.save_transactions()
+        self.transactions[next_id] = transaction
 
-        total = quantity * price
-        formatted_total = f'{total:,.2f}'
-        formatted_price = f'{price:,.2f}'
-        if action == 'Buy':
-            msg = f"Buying {quantity} of {symbol} @ ${formatted_price} (${formatted_total})."
+        # Save transaction
+        status = self.save_transactions()
 
-            self.assets.add_asset(symbol, quantity)
-            self.portfolio.update_balance(-1 * total)
-        elif action == 'Sell':
-            msg = f"Selling {quantity} of {symbol} @ ${formatted_price} (${formatted_total})."
+        if status:
+            total = quantity * price
+            formatted_total = f'{total:,.2f}'
+            formatted_price = f'{price:,.2f}'
 
-            self.assets.remove_asset(symbol, quantity)
-            self.portfolio.update_balance(total)
+            # Generate message
+            if action == OrderSide.BUY:
+                msg = f"Submitting BUY ({_type}) order of {quantity} of {symbol} @ ${formatted_price} (${formatted_total})."
+                total = -1 * total
+            elif action == OrderSide.SELL:
+                msg = f"Selling {quantity} of {symbol} @ ${formatted_price} (${formatted_total})."
 
-        print(msg)
+            # Save assets
+            status = self.assets.update_assets(action, symbol, quantity)
+
+        # Update portfolio balance
+        if status:
+            status = self.portfolio.update_balance(total)
+
+        if status:
+            print(msg)
+            return True
+
+        print("\n    Something went wrong, couldn't process order.")
+        return False
