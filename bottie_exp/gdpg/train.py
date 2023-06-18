@@ -4,6 +4,7 @@ import tensorflow as tf
 import optuna
 import json
 
+from strategies.rsi_ma_stategy import RSI_MA_Strategy
 from gdpg_strategy import GDPGStrategy
 
 # Training loop
@@ -76,15 +77,22 @@ def load_historical_data(file_path, batch_size):
 
 def objective(trial):
     # Define the search space for hyperparameters
-    # trial.suggest_int("features_shape", 2, 10)
     features_shape = FEATURES_SHAPE
-    actions_shape = ACTIONS_SHAPE  # trial.suggest_int("actions_shape", 1, 5)
+    actions_shape = ACTIONS_SHAPE
     hidden_units = trial.suggest_int("hidden_units", 32, 128)
     learning_rate = trial.suggest_float('learning_rate', 0.001, 0.1, log=True)
 
-    # Create the GDPG trading strategy
-    strategy = GDPGStrategy(
-        features_shape, actions_shape, hidden_units, learning_rate)
+    rsi_period = trial.suggest_int("rsi_period", 7, 21)
+    ma_period = trial.suggest_int("ma_period", 20, 100)
+
+    # # Create the GDPG trading strategy
+    # strategy = GDPGStrategy(
+    #     features_shape, actions_shape, hidden_units, learning_rate)
+    # strategy.strategy.rsi_period = rsi_period
+    # strategy.strategy.ma_period = ma_period
+    strategy = RSI_MA_Strategy()
+    strategy.rsi_period = rsi_period
+    strategy.ma_period = ma_period
 
     # Load and process historical data
     states, actions, rewards = load_historical_data(
@@ -120,10 +128,10 @@ def objective(trial):
             strategy.train(batch_states, batch_actions, batch_rewards)
 
     # Calculate the metric to optimize (e.g., reward, accuracy, etc.)
-    metric = calculate_metric(strategy)  # Change this to the desired metric
+    metric = calculate_metric(strategy)
 
     # Save the best model based on the metric
-    if trial.should_prune() or metric < 0:  # Prune unpromising trials or trials with negative metric
+    if trial.should_prune() or metric < 0:
         raise optuna.TrialPruned()
     else:
         strategy.model.save_weights('models/gdpg_model.h5')
